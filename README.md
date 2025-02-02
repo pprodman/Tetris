@@ -1,7 +1,7 @@
-# Proyecto Tetris en Unity
+# Proyecto Tetris en Unity 🕹️
 
-## Releases
-1. [Actividad 2A](https://github.com/pprodman/Tetris/releases/tag/v.1.0):
+## 📌 Releases
+1. **[Actividad 2A]**(https://github.com/pprodman/Tetris/releases/tag/v.1.0):
 - Creación de proyecto
 - Configuración de escena:
   - Camara principal.
