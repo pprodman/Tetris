@@ -13,5 +13,5 @@
   - `Board`: Este Script contendrá una clase estática que almacenará el estado de la partida y se encargará de asegurar la consistencia de la misma.
   - `Piece`: Este script irá asociado a los Prefabs de las piezas (a todos ellos) y contendrá los movimientos de las piezas.
  
-2. Actividad 2B
-3. Actividad 2C
+2. **Actividad 2B**
+3. **Actividad 2C**
