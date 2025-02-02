@@ -16,10 +16,10 @@
  
 ### 2. Actividad 2B: Optimización
 - Optimización de nuestro juego de Tetris con object pooling.
-- El Spawner creará una pieza de cada tipo nada más comenzar y sólo dejará habilitada y visible una pieza (la primera que caerá).
-- El tablero estará lleno de Blocks ocultos / No visibles.
-- Cuando la pieza se detiene queda por encima de ciertos Blocks del tablero. Estos Blocks en este momento se harán visibles y la pieza se moverá a una ubicación no visible y se deshabilitará su Script para poder aprovecharla de nuevo. De modo que parecerá que la pieza se ha quedado fija, cuando realmente la habremos movido para reutilizarla.
-- A continuación se habilitará una nueva pieza para que empiece a bajar.
+  - El Spawner creará una pieza de cada tipo nada más comenzar y sólo dejará habilitada y visible una pieza (la primera que caerá).
+  - El tablero estará lleno de Blocks ocultos / No visibles.
+  - Cuando la pieza se detiene queda por encima de ciertos Blocks del tablero. Estos Blocks en este momento se harán visibles y la pieza se moverá a una ubicación no visible y se deshabilitará su Script para poder aprovecharla de nuevo. De modo que parecerá que la pieza se ha quedado fija, cuando realmente la habremos movido para reutilizarla.
+  - A continuación se habilitará una nueva pieza para que empiece a bajar.
 - El resto del código deberá adaptarse en consecuencia a estos nuevos cambios.
 
 ### 3. Actividad 2C
