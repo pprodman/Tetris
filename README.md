@@ -14,7 +14,7 @@
   - `Board`: Este Script contendrá una clase estática que almacenará el estado de la partida y se encargará de asegurar la consistencia de la misma.
   - `Piece`: Este script irá asociado a los Prefabs de las piezas (a todos ellos) y contendrá los movimientos de las piezas.
  
-### 2. Actividad 2B: Optimización
+### 2. [Actividad 2B](https://github.com/pprodman/Tetris/releases/tag/v1.1): Optimización
 - Optimización de nuestro juego de Tetris con object pooling.
   - El Spawner creará una pieza de cada tipo nada más comenzar y sólo dejará habilitada y visible una pieza (la primera que caerá).
   - El tablero estará lleno de Blocks ocultos / No visibles.
