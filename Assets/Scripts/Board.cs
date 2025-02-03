@@ -1,79 +1,110 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public static int w = 10; // Width of the grid
-    public static int h = 20; // Height of the grid
-    public static GameObject[,] grid = new GameObject[w, h]; // 2D array to store the grid
+    public static int w = 10;
+    public static int h = 20;
+    public static GameObject[,] grid = new GameObject[w, h];
+    private static Spawner spawner;
 
-    // Rounds Vector2 so it does not have decimal values
+    public static void InitializeGrid(GameObject blockPrefab)
+    {
+        spawner = FindFirstObjectByType<Spawner>();
+      
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                grid[x, y] = null;
+                GameObject block = Instantiate(blockPrefab, new Vector3(x, y, 0), Quaternion.identity);
+                block.SetActive(false);
+                grid[x, y] = block;
+            }
+        }
+
+        spawner.ActivateNextPiece();
+    }
+
+    public static void ActivateBlock(int x, int y)
+    {
+        if (grid[x, y] != null)
+        {
+            grid[x, y].SetActive(true); // Activar el bloque
+        }
+    }
+
+    // Rounds Vector2 so does not have decimal values
     // Used to force Integer coordinates (without decimals) when moving pieces
     public static Vector2 RoundVector2(Vector2 v)
     {
         return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
     }
 
-    // Returns true if pos (x,y) is inside the grid, false otherwise
+    // TODO: Returns true if pos (x,y) is inside the grid, false otherwise
     public static bool InsideBorder(Vector2 pos)
     {
-        return (pos.x >= 0 && pos.x < w && pos.y >= 0);
+        return pos.x >= 0 && pos.x < w && pos.y >= 0 && pos.y < h;
     }
 
-    // Deletes all GameObjects in the row Y and sets the row cells to null
+    // TODO: Deletes all GameObjects in the row Y and set the row cells to null.
+    // You can use Destroy function to delete the GameObjects.
     public static void DeleteRow(int y)
     {
-        for (int x = 0; x < w; ++x)
+        for (int x = 0; x < w; x++)
         {
             if (grid[x, y] != null)
             {
-                Destroy(grid[x, y]); // Destroy the game object
-                grid[x, y] = null;   // Clear the reference in the grid
+                grid[x, y].SetActive(false);
             }
         }
     }
 
-    // Moves all GameObjects on row Y to row Y-1
+    // TODO: Moves all gameobject on row Y to row Y-1
+    // 2 thing change:
+    //  - All GameObjects on row Y go from cell (X,Y) to cell (X,Y-1)
+    //  - Changes the GameObject transform position Gameobject.transform.position += new Vector3(0, -1, 0).
     public static void DecreaseRow(int y)
     {
-        if (y - 1 >= 0) // Ensure the row above is within bounds
+        for (int x = 0; x < w; x++)
         {
-            for (int x = 0; x < w; ++x)
+            if (grid[x, y] != null)
             {
-                if (grid[x, y] != null)
-                {
-                    // Move the object in the grid down
-                    grid[x, y - 1] = grid[x, y];
-                    grid[x, y] = null;
+                // Move the object one row down
+                grid[x, y - 1] = grid[x, y];
+                grid[x, y] = null;
 
-                    // Update the object's position in the world
+                // Update the object's position
+                if (grid[x, y - 1] != null)
+                {
                     grid[x, y - 1].transform.position += new Vector3(0, -1, 0);
                 }
             }
         }
     }
 
-    // Decreases all rows above Y
+    // TODO: Decreases all rows above Y
     public static void DecreaseRowsAbove(int y)
     {
-        for (int i = y; i < h; ++i)
+        for (int i = y; i < h; i++)
         {
             DecreaseRow(i);
         }
     }
 
-    // Returns true if all cells in a row have a GameObject (are not null), false otherwise
-    public static bool IsRowFull(int y)
+    // TODO: Return true if all cells in a row have a GameObject (are not null), false otherwise
+    private static bool IsRowFull(int y)
     {
         for (int x = 0; x < w; ++x)
         {
-            if (grid[x, y] == null)
+            if (grid[x, y] == null || !grid[x, y].activeSelf)
             {
-                return false; // There is an empty cell, the row is not full
+                return false;
             }
         }
-        return true; // All cells are occupied
+        return true;
     }
 
     // Deletes full rows
@@ -85,8 +116,9 @@ public class Board : MonoBehaviour
             {
                 DeleteRow(y);
                 DecreaseRowsAbove(y + 1);
-                --y; // Recheck the same row index after shifting
+                --y;
             }
         }
     }
+
 }

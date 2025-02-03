@@ -24,129 +24,98 @@ public class Piece : MonoBehaviour
         // Move Left
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            // Modify position
-            transform.position += new Vector3(-1, 0, 0);
-
-            // See if it's valid
-            if (IsValidBoard())
-            {
-                // It's valid. Update grid.
-                UpdateBoard();
-            }
-            else
-            {
-                // It's not valid. Revert.
-                transform.position += new Vector3(1, 0, 0);
-            }
+            MovePiece(new Vector3(-1, 0, 0));
         }
 
         // Move Right
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            // Modify position
-            transform.position += new Vector3(1, 0, 0);
-
-            // See if it's valid
-            if (IsValidBoard())
-            {
-                // It's valid. Update grid.
-                UpdateBoard();
-            }
-            else
-            {
-                // It's not valid. Revert.
-                transform.position += new Vector3(-1, 0, 0);
-            }
+            MovePiece(new Vector3(1, 0, 0));
         }
 
-        // Rotate
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        // Rotate (Key UpArrow)
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            transform.Rotate(0, 0, -90);
-
-            // See if it's valid
+            transform.Rotate(0, 0, 90);
             if (IsValidBoard())
-            {
-                // It's valid. Update grid.
                 UpdateBoard();
-            }
             else
-            {
-                // It's not valid. Revert.
-                transform.Rotate(0, 0, 90);
-            }
+                transform.Rotate(0, 0, -90);  // Revert the rotation
         }
 
         // Move Downwards and Fall (each second)
         if (Input.GetKeyDown(KeyCode.DownArrow) || Time.time - lastFall >= 1)
         {
-            // Modify position
-            transform.position += new Vector3(0, -1, 0);
+            MovePiece(new Vector3(0, -1, 0));
+            lastFall = Time.time;
+        }
+    }
 
-            // See if it's valid
-            if (IsValidBoard())
-            {
-                // It's valid. Update grid.
-                UpdateBoard();
-            }
-            else
-            {
-                // It's not valid. Revert.
-                transform.position += new Vector3(0, 1, 0);
+    void MovePiece(Vector3 direction)
+    {
+        transform.position += direction;
+        if (IsValidBoard())
+        {
+            UpdateBoard();
+        }
+        else
+        {
+            transform.position -= direction;
 
-                // Clear filled horizontal lines
+            if (direction == new Vector3(0, -1, 0))
+            {
+                foreach (Transform child in transform)
+                {
+                    Vector2 v = Board.RoundVector2(child.position);
+                    Board.ActivateBlock((int)v.x, (int)v.y);
+                }
+
+                FindFirstObjectByType<Spawner>().ActivateNextPiece();
+                transform.position = new Vector3(-100, -100, 0); // Mover a una ubicación no visible
+                gameObject.SetActive(false);
                 Board.DeleteFullRows();
-
-                // Spawn next Group
-                FindFirstObjectByType<Spawner>().SpawnNext();
-
-                // Disable script
                 enabled = false;
             }
-
-            lastFall = Time.time;
         }
     }
 
     // Updates the board with the current position of the piece.
     void UpdateBoard()
     {
-        // Clear current positions of the piece in the grid
-        for (int y = 0; y < Board.grid.GetLength(1); y++)
+        // First, loop over the Board and make current positions of the piece null.
+        for (int y = 0; y < Board.h; y++)
         {
-            for (int x = 0; x < Board.grid.GetLength(0); x++)
+            for (int x = 0; x < Board.w; ++x)
             {
-                if (Board.grid[x, y] != null &&
-                    Board.grid[x, y].transform.parent == transform)
+                if (Board.grid[x, y] != null && Board.grid[x, y].transform.parent == transform)
                 {
                     Board.grid[x, y] = null;
                 }
             }
         }
-
-        // Update the grid with the new positions of the piece's blocks
-        foreach (Transform child in transform)
-        {
-            Vector2 v = Board.RoundVector2(child.position);
-            Board.grid[(int)v.x, (int)v.y] = child.gameObject;
-        }
     }
 
-    // Returns if the current position of the piece makes the board valid or not
-    bool IsValidBoard()
+    // Returns if the current position of the piece makes the board valid or not.
+    public bool IsValidBoard()
     {
         foreach (Transform child in transform)
         {
             Vector2 v = Board.RoundVector2(child.position);
 
+
             // Not inside Border?
             if (!Board.InsideBorder(v))
+            {
                 return false;
+            }
 
             // Block in grid cell (and not part of same group)?
             if (Board.grid[(int)v.x, (int)v.y] != null &&
-                Board.grid[(int)v.x, (int)v.y].transform.parent != transform)
+            Board.grid[(int)v.x, (int)v.y].transform.parent != transform &&
+            Board.grid[(int)v.x, (int)v.y].activeInHierarchy)
+            {
                 return false;
+            }
         }
         return true;
     }
